@@ -1,0 +1,465 @@
+### Eclipse Workspace Patch 1.0
+#P villegas-tax-web
+Index: .settings/org.eclipse.wst.common.component
+===================================================================
+--- .settings/org.eclipse.wst.common.component	(revision 29821)
++++ .settings/org.eclipse.wst.common.component	(working copy)
+@@ -3,7 +3,8 @@
+         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
+         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
+         <wb-resource deploy-path="/" source-path="/target/m2e-wtp/web-resources"/>
+-        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/webapp" tag="defaultRootSource"/>
++        <wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
++        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/webapp"/>
+         <dependent-module archiveName="villegas-fenix-theme-01.00.01-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/villegas-fenix-theme/villegas-fenix-theme">
+             <dependency-type>uses</dependency-type>
+         </dependent-module>
+Index: .settings/org.eclipse.wst.common.project.facet.core.xml
+===================================================================
+--- .settings/org.eclipse.wst.common.project.facet.core.xml	(revision 29492)
++++ .settings/org.eclipse.wst.common.project.facet.core.xml	(working copy)
+@@ -4,4 +4,5 @@
+   <installed facet="jst.web" version="3.0"/>
+   <installed facet="jst.jsf" version="2.0"/>
+   <installed facet="wst.jsdt.web" version="1.0"/>
++  <installed facet="jst.jaxrs" version="1.1"/>
+ </faceted-project>
+Index: .settings/org.eclipse.wst.common.project.facet.core.prefs.xml
+===================================================================
+--- .settings/org.eclipse.wst.common.project.facet.core.prefs.xml	(revision 29492)
++++ .settings/org.eclipse.wst.common.project.facet.core.prefs.xml	(working copy)
+@@ -4,4 +4,9 @@
+       <attribute name="provider-id" value="jsf-no-op-library-provider"/>
+     </node>
+   </facet>
++  <facet id="jst.jaxrs">
++    <node name="libprov">
++      <attribute name="provider-id" value="jaxrs-no-op-library-provider"/>
++    </node>
++  </facet>
+ </root>
+Index: src/main/webapp/WEB-INF/web.xml
+===================================================================
+--- src/main/webapp/WEB-INF/web.xml	(revision 0)
++++ src/main/webapp/WEB-INF/web.xml	(revision 0)
+@@ -0,0 +1,197 @@
++<web-app
++	version="3.0"
++	xmlns="http://java.sun.com/xml/ns/javaee"
++	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
++	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
++
++	<session-config>
++		<session-timeout>15</session-timeout>
++	</session-config>
++
++	<!-- Jsf2 -->
++	<servlet>
++		<servlet-name>facesServlet</servlet-name>
++		<servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
++		<load-on-startup>0</load-on-startup>
++	</servlet>
++
++	<servlet-mapping>
++		<servlet-name>facesServlet</servlet-name>
++		<url-pattern>*.jsf</url-pattern>
++	</servlet-mapping>
++
++	<servlet>
++		<servlet-name>resteasy-servlet</servlet-name>
++		<servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
++		<init-param>
++			<param-name>javax.ws.rs.Application</param-name>
++			<param-value>com.tallion.villegas.tax.web.rest.app.RestApp</param-value>
++		</init-param>
++	</servlet>
++
++	<servlet-mapping>
++		<servlet-name>resteasy-servlet</servlet-name>
++		<url-pattern>/rest/*</url-pattern>
++	</servlet-mapping>
++
++	<!-- Filter -->
++	<filter>
++		<filter-name>CorsFilter</filter-name>
++		<filter-class>com.tallion.villegas.tax.web.rest.filter.CorsFilter</filter-class>
++	</filter>
++	<filter-mapping>
++		<filter-name>CorsFilter</filter-name>
++		<url-pattern>/rest/*</url-pattern>
++	</filter-mapping>
++
++	<context-param>
++		<param-name>resteasy.scan</param-name>
++		<param-value>true</param-value>
++	</context-param>
++
++	<context-param>
++		<param-name>resteasy.servlet.mapping.prefix</param-name>
++		<param-value>/rest</param-value>
++	</context-param>
++
++	<context-param>
++		<param-name>javax.faces.STATE_SAVING_METHOD</param-name>
++		<param-value>client</param-value>
++	</context-param>
++
++	<context-param>
++		<param-name>javax.faces.PARTIAL_STATE_SAVING</param-name>
++		<param-value>true</param-value>
++	</context-param>
++
++	<context-param>
++		<param-name>javax.faces.PROJECT_STAGE</param-name>
++		<param-value>Production</param-value>
++	</context-param>
++
++	<context-param>
++		<param-name>javax.faces.DEFAULT_SUFFIX</param-name>
++		<param-value>.xhtml</param-value>
++	</context-param>
++
++	<context-param>
++		<param-name>javax.faces.FACELETS_SKIP_COMMENTS</param-name>
++		<param-value>true</param-value>
++	</context-param>
++
++	<context-param>
++		<param-name>com.sun.faces.allowTextChildren</param-name>
++		<param-value>true</param-value>
++	</context-param>
++
++	<context-param>
++		<param-name>javax.faces.DATETIMECONVERTER_DEFAULT_TIMEZONE_IS_SYSTEM_TIMEZONE</param-name>
++		<param-value>true</param-value>
++	</context-param>
++
++	<context-param>
++		<param-name>javax.faces.FACELETS_LIBRARIES</param-name>
++		<param-value>/WEB-INF/functions.taglib.xml</param-value>
++	</context-param>
++
++	<!-- Primefaces -->
++	<filter>
++		<filter-name>primeFacesFileUploadFilter</filter-name>
++		<filter-class>org.primefaces.webapp.filter.FileUploadFilter</filter-class>
++	</filter>
++
++	<filter-mapping>
++		<filter-name>primeFacesFileUploadFilter</filter-name>
++		<servlet-name>facesServlet</servlet-name>
++	</filter-mapping>
++
++	<filter>
++		<filter-name>primeFacesCharacterEncodingFilter</filter-name>
++		<filter-class>com.ebizlink.adonis.common.ui.filter.CharacterEncodingFilter</filter-class>
++	</filter>
++
++	<filter-mapping>
++		<filter-name>primeFacesCharacterEncodingFilter</filter-name>
++		<servlet-name>facesServlet</servlet-name>
++	</filter-mapping>
++
++	<context-param>
++		<param-name>primefaces.THEME</param-name>
++		<param-value>fenix</param-value>
++	</context-param>
++
++	<context-param>
++		<param-name>primefaces.THEME_FORMS</param-name>
++		<param-value>true</param-value>
++	</context-param>
++
++	<context-param>
++		<param-name>primefaces.PRIVATE_CAPTCHA_KEY</param-name>
++		<param-value>6LfwZwoAAAAAAEhRyntKF1PBzysAJLzqp2v-GMRR</param-value>
++	</context-param>
++
++	<context-param>
++		<param-name>primefaces.PUBLIC_CAPTCHA_KEY</param-name>
++		<param-value>6LfwZwoAAAAAAI-oUHpdvRnkMfu9fXQHxc0P7IBu</param-value>
++	</context-param>
++
++	<!-- Pages -->
++	<welcome-file-list>
++		<welcome-file>index.html</welcome-file>
++	</welcome-file-list>
++
++	<!-- Error pages -->
++	<error-page>
++		<error-code>400</error-code>
++		<location>/error/err-400.jsf</location>
++	</error-page>
++	<error-page>
++		<error-code>401</error-code>
++		<location>/error/err-401.jsf</location>
++	</error-page>
++	<error-page>
++		<error-code>404</error-code>
++		<location>/error/err-404.jsf</location>
++	</error-page>
++	<error-page>
++		<error-code>500</error-code>
++		<location>/error/err-500.jsf</location>
++	</error-page>
++
++	<!-- Roles -->
++	<security-role>
++		<role-name>BASIC</role-name>
++	</security-role>
++	<security-constraint>
++		<web-resource-collection>
++			<web-resource-name />
++			<url-pattern>/views/*</url-pattern>
++		</web-resource-collection>
++		<auth-constraint>
++			<role-name>BASIC</role-name>
++		</auth-constraint>
++		<user-data-constraint>
++			<transport-guarantee>NONE</transport-guarantee>
++		</user-data-constraint>
++	</security-constraint>
++	<security-constraint>
++		<web-resource-collection>
++			<web-resource-name />
++			<url-pattern>*.xhtml</url-pattern>
++		</web-resource-collection>
++		<auth-constraint />
++		<user-data-constraint>
++			<transport-guarantee>NONE</transport-guarantee>
++		</user-data-constraint>
++	</security-constraint>
++
++	<login-config>
++		<auth-method>FORM</auth-method>
++		<realm-name>adonis-all-domain</realm-name>
++		<form-login-config>
++			<form-login-page>/login.jsf</form-login-page>
++			<form-error-page>/error/err-403.jsf</form-error-page>
++		</form-login-config>
++	</login-config>
++
++</web-app>
+\ No newline at end of file
+
+Property changes on: src/main/webapp/WEB-INF/web.xml
+___________________________________________________________________
+Added: svn:executable
+   + *
+
+Index: src/main/java/com/tallion/villegas/tax/web/rest/app/RestApp.java
+===================================================================
+--- src/main/java/com/tallion/villegas/tax/web/rest/app/RestApp.java	(revision 0)
++++ src/main/java/com/tallion/villegas/tax/web/rest/app/RestApp.java	(revision 0)
+@@ -0,0 +1,16 @@
++package com.tallion.villegas.tax.web.rest.app;
++
++import javax.ws.rs.ApplicationPath;
++import javax.ws.rs.core.Application;
++
++/**
++ * A class extending {@link Application} and annotated with @ApplicationPath is the Java EE 6 "no XML" approach to activating JAX-RS.
++ * <p>
++ * Resources are served relative to the servlet path specified in the {@link ApplicationPath} annotation.
++ * </p>
++ */
++@ApplicationPath("/rest")
++public class RestApp extends Application
++{
++	/* class body intentionally left blank */
++}
+Index: pom.xml
+===================================================================
+--- pom.xml	(revision 29683)
++++ pom.xml	(working copy)
+@@ -1,4 +1,7 @@
+-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
++<project
++	xmlns="http://maven.apache.org/POM/4.0.0"
++	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
++	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+ 
+ 	<!-- Main -->
+ 	<modelVersion>4.0.0</modelVersion>
+@@ -46,6 +49,18 @@
+ 			<groupId>com.tallion.villegas</groupId>
+ 			<artifactId>villegas-fenix-theme</artifactId>
+ 		</dependency>
++		<dependency>
++			<groupId>org.jboss.resteasy</groupId>
++			<artifactId>resteasy-jaxrs</artifactId>
++			<version>2.2.1.GA</version>
++			<scope>provided</scope>
++		</dependency>
++		<dependency>
++			<groupId>org.jboss.resteasy</groupId>
++			<artifactId>resteasy-multipart-provider</artifactId>
++			<version>2.2.0.GA</version>
++			<scope>provided</scope>
++		</dependency>
+ 	</dependencies>
+ 
+ 	<!-- Subversion -->
+Index: src/main/java/com/tallion/villegas/tax/web/rest/filter/CorsFilter.java
+===================================================================
+--- src/main/java/com/tallion/villegas/tax/web/rest/filter/CorsFilter.java	(revision 0)
++++ src/main/java/com/tallion/villegas/tax/web/rest/filter/CorsFilter.java	(revision 0)
+@@ -0,0 +1,45 @@
++package com.tallion.villegas.tax.web.rest.filter;
++
++import java.io.IOException;
++import javax.servlet.Filter;
++import javax.servlet.FilterChain;
++import javax.servlet.FilterConfig;
++import javax.servlet.ServletException;
++import javax.servlet.ServletRequest;
++import javax.servlet.ServletResponse;
++import javax.servlet.http.HttpServletResponse;
++
++public class CorsFilter implements Filter
++{
++	/**
++	 */
++	@Override
++	public void init(FilterConfig filterConfig) throws ServletException
++	{
++	}
++
++	/**
++	 */
++	@Override
++	public void destroy()
++	{
++	}
++
++	/**
++	 */
++	@Override
++	public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException
++	{
++		if (servletResponse instanceof HttpServletResponse)
++		{
++			HttpServletResponse response = ((HttpServletResponse) servletResponse);
++			response.addHeader("Access-Control-Allow-Origin", "*");
++			response.addHeader("Access-Control-Allow-Headers", "origin, content-type, accept, authorization");
++			response.addHeader("Access-Control-Allow-Credentials", "true");
++			response.addHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD");
++			response.addHeader("Content-Type", "application/json");
++			response.addHeader("Accept", "application/json");
++		}
++		filterChain.doFilter(servletRequest, servletResponse);
++	}
++}
+Index: src/main/java/com/tallion/villegas/tax/web/rest/endpoint/DocumentTypeEndPoint.java
+===================================================================
+--- src/main/java/com/tallion/villegas/tax/web/rest/endpoint/DocumentTypeEndPoint.java	(revision 0)
++++ src/main/java/com/tallion/villegas/tax/web/rest/endpoint/DocumentTypeEndPoint.java	(revision 0)
+@@ -0,0 +1,108 @@
++package com.tallion.villegas.tax.web.rest.endpoint;
++
++import java.io.Serializable;
++import javax.ejb.EJB;
++import javax.ejb.Stateless;
++import javax.ws.rs.Consumes;
++import javax.ws.rs.DELETE;
++import javax.ws.rs.GET;
++import javax.ws.rs.POST;
++import javax.ws.rs.PUT;
++import javax.ws.rs.Path;
++import javax.ws.rs.PathParam;
++import javax.ws.rs.Produces;
++import javax.ws.rs.core.MediaType;
++import javax.ws.rs.core.Response;
++import javax.ws.rs.core.Response.Status;
++import com.ebizlink.adonis.config.model.DocumentType;
++import com.ebizlink.adonis.config.service.manager.local.DocumentTypeManagerLocal;
++import com.ebizlink.pandora2.core.util.CompareUtil;
++import com.ebizlink.pandora2.server.exception.ManagerException;
++import com.ebizlink.pandora2.server.model.support.QueryHint;
++
++@Stateless
++@Path("/documentType")
++public class DocumentTypeEndPoint implements Serializable
++{
++	/**
++	 */
++	private static final long serialVersionUID = 1L;
++
++	@EJB
++	private DocumentTypeManagerLocal documentTypeML;
++
++	@GET
++	@Produces(MediaType.APPLICATION_JSON)
++	public DocumentType[] get()
++	{
++		return documentTypeML.getQueryHintResult("", new QueryHint(0, Integer.MAX_VALUE)).getQueryList().toArray(new DocumentType[0]);
++	}
++
++	@GET
++	@Path("/get:{id:[0-9][0-9]*}")
++	@Produces(MediaType.TEXT_PLAIN)
++	public Response findById(@PathParam("id") Long id)
++	{
++		final DocumentType documentType = documentTypeML.get(id);
++		if (CompareUtil.isEmpty(documentType))
++		{
++			return Response.status(Status.NOT_FOUND).build();
++		}
++		return Response.ok(documentType).build();
++	}
++
++	@POST
++	@Consumes(MediaType.APPLICATION_JSON)
++	@Produces(MediaType.TEXT_PLAIN)
++	public Response create(DocumentType documentType)
++	{
++		Response r = null;
++		try
++		{
++			documentTypeML.save(documentType);
++		}
++		catch (ManagerException e)
++		{
++			System.out.println("exception in create " + e);
++			r = Response.ok("error").build();
++		}
++		return r;
++	}
++
++	@PUT
++	@Consumes(MediaType.APPLICATION_JSON)
++	@Produces(MediaType.TEXT_PLAIN)
++	public Response update(DocumentType documentType)
++	{
++		Response r = null;
++		try
++		{
++			documentTypeML.save(documentType);
++		}
++		catch (ManagerException e)
++		{
++			System.out.println("exception in update " + e);
++			r = Response.ok("error").build();
++		}
++		return r;
++	}
++
++	@DELETE
++	@Path("/{id:[0-9][0-9]*}")
++	@Produces(MediaType.TEXT_PLAIN)
++	public Response deleteById(@PathParam("id") Long id)
++	{
++		Response r = null;
++		try
++		{
++			documentTypeML.delete(id);
++			r = Response.ok("OK").build();
++		}
++		catch (Exception e)
++		{
++			System.out.println("exception in create " + e);
++			r = Response.ok("error").build();
++		}
++		return r;
++	}
++}

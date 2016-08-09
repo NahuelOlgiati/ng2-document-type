@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
+import { DocumentType } from '../document-type';
 
 @Component({
   moduleId: module.id,
@@ -6,6 +7,8 @@ import { Component, OnInit } from '@angular/core';
   templateUrl: 'document-type-item.component.html'
 })
 export class DocumentTypeItemComponent implements OnInit {
+
+  @Input() documentType: DocumentType;
 
   constructor() { }
 

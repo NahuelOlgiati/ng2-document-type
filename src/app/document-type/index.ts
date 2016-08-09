@@ -1,1 +1,2 @@
-export * from './document-type.component';
+export * from './document-type';
+export * from './document-type.service';

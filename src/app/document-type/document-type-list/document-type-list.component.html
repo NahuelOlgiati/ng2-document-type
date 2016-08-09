@@ -1,3 +1,7 @@
-<p>
-  document-type-list works!
-</p>
+<div class="row">
+  <div class="col-xs-12">
+    <ul class="list-group">
+      <t-document-type-item *ngFor="let documentType of documentTypes" [documentType]="documentType"></t-document-type-item>
+    </ul>
+  </div>
+</div>
